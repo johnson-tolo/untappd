@@ -32,12 +32,14 @@ def tracked_users():
                 line_count += 1
     f = open("tracked_users_stg.csv", "w+")
     f.close()
-    print(user_array)
     return user_array
 
 # makes an api call for a list of users
 def pull_user_info(user):
     response = api_call('user/info/', user, '&compact=true')
+    if str(response.json()["meta"]["code"]) != "200":
+        print("Error",str(response.json()["meta"]["code"])," ", str(response.json()["meta"]["error_detail"]))
+        quit()
     user_arr = []
     user_arr.append(datetime.now())
     user_arr.append(response.json()["response"]["user"]["uid"])
@@ -63,8 +65,6 @@ def pull_user_info(user):
     user_arr.append(response.json()["response"]["user"]["is_supporter"])
     user_arr.append(response.json()["response"]["user"]["untappd_url"])
     user_arr.append(response.json()["response"]["user"]["account_type"])
-    print("user_arr")
-    print(user_arr)
     return user_arr
 
 # append row to given csv
@@ -130,37 +130,40 @@ def get_beers(user, beers_missing):
         response = api_call('user/beers/', user, '&limit='+str(api_call_limit)+'&offset='+str(50*(page)))
         x = 0
         while(x<api_call_limit):
+            if str(response.json()["meta"]["code"]) != "200":
+                print("Error",str(response.json()["meta"]["code"])," ", str(response.json()["meta"]["error_detail"]))
+                quit()
             user_arr = []
             user_arr.append(user),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["beer"]["beer_name"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["beer"]["bid"])),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["beer"]["beer_name"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["beer"]["bid"]).replace('\n',' ')),
             user_arr.append(float(response.json()["response"]["beers"]["items"][x]["beer"]["beer_abv"])),
             user_arr.append(int(response.json()["response"]["beers"]["items"][x]["beer"]["beer_ibu"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["beer"]["beer_style"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["beer"]["beer_description"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["beer"]["beer_label"])),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["beer"]["beer_style"]).replace('\n',' ')),
+            #user_arr.append(str(response.json()["response"]["beers"]["items"][x]["beer"]["beer_description"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["beer"]["beer_label"]).replace('\n',' ')),
             user_arr.append(float(response.json()["response"]["beers"]["items"][x]["beer"]["rating_score"])),
             user_arr.append(int(response.json()["response"]["beers"]["items"][x]["beer"]["rating_count"])),
             user_arr.append(float(response.json()["response"]["beers"]["items"][x]["rating_score"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["recent_checkin_id"])),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["recent_checkin_id"]).replace('\n',' ')),
             user_arr.append(datetime.strptime(str(response.json()["response"]["beers"]["items"][x]["recent_created_at"])[5:25], '%d %b %Y %H:%M:%S')),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["first_checkin_id"])),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["first_checkin_id"]).replace('\n',' ')),
             user_arr.append(datetime.strptime(str(response.json()["response"]["beers"]["items"][x]["first_created_at"])[5:25], '%d %b %Y %H:%M:%S')),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["recent_created_at_timezone"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["brewery_id"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["brewery_name"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["brewery_type"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["brewery_label"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["contact"]["twitter"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["contact"]["facebook"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["contact"]["instagram"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["contact"]["url"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["country_name"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["location"]["brewery_city"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["location"]["brewery_state"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["location"]["lat"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["location"]["lng"])),
-            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["brewery_active"]))
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["recent_created_at_timezone"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["brewery_id"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["brewery_name"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["brewery_type"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["brewery_label"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["contact"]["twitter"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["contact"]["facebook"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["contact"]["instagram"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["contact"]["url"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["country_name"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["location"]["brewery_city"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["location"]["brewery_state"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["location"]["lat"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["location"]["lng"]).replace('\n',' ')),
+            user_arr.append(str(response.json()["response"]["beers"]["items"][x]["brewery"]["brewery_active"]).replace('\n',' '))
             response_arr.append(user_arr)  
             x += 1 
         page += 1
